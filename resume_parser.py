@@ -29,14 +29,13 @@ class Candidate(BaseModel):
         None, description="A list of skills possessed by the candidate"
     )
 
+# LLM query model and embedding model definition
+llm = Gemini(model_name="models/gemini-1.5-flash-002", api_key=GOOGLE_API_KEY)
+embed_model = GeminiEmbedding(
+    model_name="models/text-embedding-004", api_key=GOOGLE_API_KEY
+)
 
 def get_insights(file):
-    # LLM query model and embedding model definition
-    llm = Gemini(model_name="models/gemini-1.5-flash-002", api_key=GOOGLE_API_KEY)
-    embed_model = GeminiEmbedding(
-        model_name="models/text-embedding-004", api_key=GOOGLE_API_KEY
-    )
-
     # Text Splitter strategy
     sentenceSplitter = SentenceSplitter(chunk_size=1024, chunk_overlap=20)
     # sentenceSplitter.get_nodes_from_documents(documents)

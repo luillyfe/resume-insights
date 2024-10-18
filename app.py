@@ -1,8 +1,9 @@
 import streamlit as st
 import tempfile
 import random
+import json
 
-from resume_parser import get_insights
+from resume_parser import get_insights, llm
 
 
 def main():
@@ -83,15 +84,34 @@ def display_skills(skills):
                 st.progress(proficiency / 100)
 
         # Expandable section for skill details
-        with st.expander("Skill Details"):
-            for skill in skills:
-                st.write(
-                    f"**{skill}**: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-                )
+        st.subheader(
+            "How relevant are the skills for Founding AI Data Engineer Position at LlamaIndex?"
+        )
+        with st.expander("Skill Relevance"):
+            skills_job_prompt = [
+                f"""Given this skill: {skill}, please provide your reasoning for why this skill 
+                matter to the follloging job position: Founding AI Data Engineer at LlamaIndex.
+                if the skill is not relevant please say so."""
+                for skill in skills
+            ]
+
+            skills_job_prompt = f"""{", ".join(skills_job_prompt)}
+                Provide the result in a structured JSON format. Please remove any ```json ``` characters from the output.
+                """
+
+            if "job_matching_skills" not in st.session_state:
+                output = llm.complete(skills_job_prompt)
+                st.session_state.job_matching_skills = json.loads(output.text)
+
+            else:
+                for skill, reasoning in st.session_state.job_matching_skills.items():
+                    st.write(f"**{skill}**: {reasoning['relevance']}")
 
         # Interactive elements
-        selected_skill = st.selectbox("Select a skill to highlight:", skills)
-        st.info(f"You selected {selected_skill}. This skill is crucial for...")
+        selected_skill = st.selectbox(
+            "Select a skill to highlight:", st.session_state.job_matching_skills.keys()
+        )
+        st.info(f"{st.session_state.job_matching_skills[selected_skill]['reasoning']}")
 
 
 if __name__ == "__main__":
