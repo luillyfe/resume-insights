@@ -8,32 +8,19 @@ from llama_index.core import (
 from llama_parse import LlamaParse
 from llama_index.core.node_parser import SentenceSplitter
 
-from pydantic import BaseModel, Field
-from typing import Optional
-
 import os
+
+from models import Candidate
 
 GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
 LLAMA_CLOUD_API_KEY = os.environ["LLAMA_CLOUD_API_KEY"]
-
-
-# Candidate Data Structure Definition (output definition)
-class Candidate(BaseModel):
-    name: Optional[str] = Field(None, description="The full name of the candidate")
-    email: Optional[str] = Field(None, description="The email of the candidate")
-    age: Optional[int] = Field(
-        None,
-        description="The age of the candidate. If not explicitly stated, estimate based on education or work experience.",
-    )
-    skills: Optional[list[str]] = Field(
-        None, description="A list of skills possessed by the candidate"
-    )
 
 # LLM query model and embedding model definition
 llm = Gemini(model_name="models/gemini-1.5-flash-002", api_key=GOOGLE_API_KEY)
 embed_model = GeminiEmbedding(
     model_name="models/text-embedding-004", api_key=GOOGLE_API_KEY
 )
+
 
 def get_insights(file):
     # Text Splitter strategy
