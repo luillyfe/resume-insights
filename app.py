@@ -3,6 +3,7 @@ import tempfile
 import random
 import json
 
+from models import JobSkill
 from resume_parser import get_insights, llm
 
 
@@ -84,34 +85,58 @@ def display_skills(skills):
                 st.progress(proficiency / 100)
 
         # Expandable section for skill details
-        st.subheader(
-            "How relevant are the skills for Founding AI Data Engineer Position at LlamaIndex?"
+        job_position = st.selectbox(
+            "Select a job position:",
+            [
+                "Founding AI Data Engineer",
+                "Founding AI Engineer",
+                "Founding AI Engineer, Backend",
+                "Founding AI Solutions Engineer",
+            ],
+            on_change=lambda: st.session_state.pop("job_matching_skills", None),
         )
-        with st.expander("Skill Relevance"):
+        company = "LlamaIndex"
+
+        st.subheader(
+            f"How relevant are the skills for {job_position} Position at {company}?"
+        )
+
+        with st.spinner("Matching candidate's skills to job position..."):
             skills_job_prompt = [
                 f"""Given this skill: {skill}, please provide your reasoning for why this skill 
-                matter to the follloging job position: Founding AI Data Engineer at LlamaIndex.
-                if the skill is not relevant please say so."""
+                    matter to the follloging job position: {job_position} at {company}.
+                    if the skill is not relevant please say so.
+                    Use system thinking level 3 to accomplish this task"""
                 for skill in skills
             ]
 
             skills_job_prompt = f"""{", ".join(skills_job_prompt)}
+                output shema: {JobSkill().model_dump_json()}
                 Provide the result in a structured JSON format. Please remove any ```json ``` characters from the output.
                 """
 
             if "job_matching_skills" not in st.session_state:
                 output = llm.complete(skills_job_prompt)
                 st.session_state.job_matching_skills = json.loads(output.text)
-
             else:
-                for skill, reasoning in st.session_state.job_matching_skills.items():
-                    st.write(f"**{skill}**: {reasoning['relevance']}")
+                with st.expander("Skill Relevance"):
+                    for (
+                        _,
+                        props,
+                    ) in enumerate(st.session_state.job_matching_skills["results"]):
+                        st.write(f"**{props["skill"]}**: {props["relevance"]}")
 
         # Interactive elements
         selected_skill = st.selectbox(
-            "Select a skill to highlight:", st.session_state.job_matching_skills.keys()
+            "Select a skill to highlight:",
+            map(
+                lambda props: props["skill"],
+                st.session_state.job_matching_skills["results"],
+            ),
         )
-        st.info(f"{st.session_state.job_matching_skills[selected_skill]['reasoning']}")
+        st.info(
+            f"{[skill["reasoning"] for skill in st.session_state.job_matching_skills["results"] if skill["skill"] == selected_skill][0]}"
+        )
 
 
 if __name__ == "__main__":
