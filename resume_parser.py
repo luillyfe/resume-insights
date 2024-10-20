@@ -33,12 +33,12 @@ def get_insights(file):
     Settings.node_parser = sentenceSplitter
 
     # Output Schema
-    output_schema = Candidate()
+    output_schema = Candidate.model_json_schema()
 
     # Prompt
     prompt = f"""
             Extract the following information from the resume:
-            {output_schema.model_dump_json()}
+            {output_schema}
             Provide the result in a structured JSON format. Please remove any ```json ``` characters from the output.
             """
 
