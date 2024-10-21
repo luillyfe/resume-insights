@@ -110,19 +110,21 @@ def display_skills(skills: list[str]):
                 st.session_state.job_matching_skills = (
                     st.session_state.resumeInsights.match_job_to_skills(
                         skills, job_position, company
-                    )
+                    ).skills
                 )
             else:
                 with st.expander("Skill Relevance"):
-                    for skill, props in st.session_state.job_matching_skills.items():
-                        st.write(f"**{skill}**: {props["relevance"]}")
+                    for skill in st.session_state.job_matching_skills:
+                        st.write(
+                            f"**{skill}**: {st.session_state.job_matching_skills[skill].relevance}"
+                        )
 
         # Interactive elements
         selected_skill = st.selectbox(
             "Select a skill to highlight:",
             st.session_state.job_matching_skills,
         )
-        st.info(f"{st.session_state.job_matching_skills[selected_skill]["reasoning"]}")
+        st.info(f"{st.session_state.job_matching_skills[selected_skill].reasoning}")
 
 
 if __name__ == "__main__":
