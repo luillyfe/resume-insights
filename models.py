@@ -31,3 +31,4 @@ class Skill(BaseModel):
 
 class JobSkill(BaseModel):
     skills: Dict[str, Skill] = Field(None, description="Skill")
+    jobName: str = Field(None, description="Job position name")
