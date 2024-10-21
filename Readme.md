@@ -1,18 +1,17 @@
-
-
 # Resume Insights
 
-![Resume Insights Logo](workflow.svg)
+![Resume Insights Workflow](workflow.svg)
 
 Resume Insights is an advanced resume parsing and analysis tool that leverages the power of LlamaIndex, Gemini, and Streamlit to extract key information from PDF resumes and present it in an intuitive, interactive format.
 
 ## 🌟 Features
 
-- **PDF Resume Parsing**: Seamlessly extract information from PDF resumes.
-- **AI-Powered Analysis**: Utilizes Gemini LLM for intelligent information extraction.
+- **PDF Resume Parsing**: Seamlessly extract information from PDF resumes using LlamaParse.
+- **AI-Powered Analysis**: Utilizes Gemini LLM for intelligent information extraction and skill matching.
 - **Interactive UI**: Built with Streamlit for a user-friendly experience.
 - **Skill Visualization**: Displays top skills with interactive progress bars.
-- **Structured Output**: Extracts name, email, age, and skills in a structured format.
+- **Job Matching**: Analyzes skill relevance for specific job positions.
+- **Structured Output**: Extracts name, email, age, and skills in a structured format using Pydantic models.
 
 ## 🚀 Quick Start
 
@@ -42,19 +41,35 @@ Resume Insights is an advanced resume parsing and analysis tool that leverages t
 
 ## 🛠️ Tech Stack
 
-- **LlamaIndex**: For document processing and indexing.
+- **LlamaIndex**: For document processing, indexing, and querying.
 - **Gemini**: AI model for natural language understanding and generation.
 - **Streamlit**: For building the interactive web application.
 - **Pydantic**: For data validation and settings management.
 - **LlamaParse**: For efficient PDF parsing.
 
+
+![Resume Insights Stack](stack.svg)
+
 ## 📊 How It Works
 
 1. **Document Processing**: Resumes are parsed using LlamaParse and split into manageable chunks.
 2. **Indexing**: Processed documents are indexed using LlamaIndex's VectorStoreIndex.
-3. **Querying**: Natural language queries are processed to extract relevant information.
-4. **Structured Output**: Results are validated against a Pydantic model for consistency.
-5. **Visualization**: Extracted information is presented through an intuitive Streamlit interface.
+3. **Information Extraction**: The system extracts key information like name, email, age, and skills.
+4. **Skill Analysis**: Top skills are displayed with visualizations.
+5. **Job Matching**: Skills are analyzed for relevance to specific job positions.
+6. **Interactive UI**: Users can explore extracted information and job matching results through a Streamlit interface.
+
+## 🧠 Key Components
+
+- `ResumeInsights`: Main class for processing resumes and extracting information.
+- `Candidate`: Pydantic model for structured candidate data.
+- `JobSkill`: Pydantic model for skill relevance to job positions.
+- Streamlit app: Provides the user interface for uploading resumes and displaying insights.
+
+## ⚠️ Limitations
+
+- The free tier of the Gemini API/Google Cloud has a 10k byte limit on request payloads, which may limit the number of skills that can be processed: [issue](https://discuss.ai.google.dev/t/payload-size-limit-error-with-embed-content-api/44342).
+- LlamaIndex may face challenges with knowledge dispersed across different sections of a document, such as inferring age or skill proficiency from work experience.
 
 ## 🤝 Contributing
 
@@ -70,4 +85,4 @@ For any queries or suggestions, please open an issue or contact [luillyfe89@gmai
 
 ---
 
-Made with ❤️ by []
+Made with ❤️ by [Fermin Blanco](https://luillyfe.medium.com/)
