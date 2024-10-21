@@ -46,7 +46,7 @@ class ResumeInsights:
         # Pydanctic model
         return Candidate.model_validate_json(output.response)
 
-    def match_job_to_skills(self, skills, job_position, company):
+    def match_job_to_skills(self, skills, job_position, company) -> JobSkill:
         skills_job_prompt = [
             f"""Given this skill: {skill}, please provide your reasoning for why this skill 
                     matter to the follloging job position: {job_position} at {company}.
@@ -61,7 +61,8 @@ class ResumeInsights:
             """
 
         output = self.query_engine.query(skills_job_prompt)
-        return json.loads(output.response)["skills"]
+        # return json.loads(output.response)["skills"]
+        return JobSkill.model_validate_json(output.response)
 
     def _create_query_engine(self, file_path: str):
         """
