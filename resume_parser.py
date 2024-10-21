@@ -9,7 +9,6 @@ from llama_parse import LlamaParse
 from llama_index.core.node_parser import SentenceSplitter
 
 import os
-import json
 
 from models import Candidate, JobSkill
 

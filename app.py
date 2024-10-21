@@ -12,12 +12,15 @@ def main():
     st.write("Upload a resume PDF to extract key information.")
 
     # Show upload file control
-    uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+    uploaded_file = st.file_uploader(
+        "Select Your Resume (PDF)", type="pdf", help="Choose a PDF file up to 5MB"
+    )
 
     if uploaded_file is not None:
         if st.button("Get Insights"):
             with st.spinner("Parsing resume... This may take a moment."):
                 try:
+                    # Temporary file handling
                     with tempfile.NamedTemporaryFile(
                         delete=False, suffix=".pdf"
                     ) as temp_file:
@@ -31,7 +34,7 @@ def main():
                     )
 
                 except Exception as e:
-                    st.error(f"An error occurred while parsing the resume: {str(e)}")
+                    st.error(f"Failed to extract insights: {str(e)}")
 
         if "insights" in st.session_state:
             insights = st.session_state.insights
@@ -41,7 +44,10 @@ def main():
             st.write(f"**Email:** {insights.email}")
             st.write(f"**Age:** {insights.age}")
 
-            # The Free Tier Gemini API has a limitation of 10k bytes, reducing the skill's number save us some trouble later on!
+            # The Free Tier Gemini API has a limitation of 10k bytes on the request payload,
+            # and since the query engine is going to augment the prompt
+            # with conxtextual information found in the document,
+            # reducing the skill's number would limit the request payload.
             skills = insights.skills[:20]
             display_skills(skills)
 
@@ -53,6 +59,12 @@ def main():
     st.sidebar.info(
         "This app uses LlamaIndex and Gemini to parse resumes and extract key information. "
         "Upload a PDF resume to see it in action!"
+    )
+    st.sidebar.subheader("Long Rank Dependencies Limitation")
+    st.sidebar.info(
+        """ LlamaIndex faces challenges when it comes to handling knowledge dispersed across different sections of a document. 
+        Specifically, important details like age and skills proficiency that could be inferred by calculating the number of years 
+        a candidate has worked are difficult to deduce automatically."""
     )
 
 
