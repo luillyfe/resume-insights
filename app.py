@@ -1,10 +1,8 @@
 import streamlit as st
 import tempfile
 import random
-import json
 
-from models import JobSkill, Skill
-from resume_parser import get_insights, llm
+from resume_parser import ResumeInsights
 
 
 def main():
@@ -26,7 +24,11 @@ def main():
                         temp_file.write(uploaded_file.getvalue())
                         temp_file_path = temp_file.name
 
-                    st.session_state.insights = get_insights(temp_file_path)
+                    # Extract the candidate data from the resume
+                    st.session_state.resumeInsights = ResumeInsights(temp_file_path)
+                    st.session_state.insights = (
+                        st.session_state.resumeInsights.extract_candidate_data()
+                    )
 
                 except Exception as e:
                     st.error(f"An error occurred while parsing the resume: {str(e)}")
@@ -39,7 +41,9 @@ def main():
             st.write(f"**Email:** {insights.email}")
             st.write(f"**Age:** {insights.age}")
 
-            display_skills(insights.skills)
+            # The Free Tier Gemini API has a limitation of 10k bytes, reducing the skill's number save us some trouble later on!
+            skills = insights.skills[:20]
+            display_skills(skills)
 
     else:
         st.info("Please upload a PDF resume to get started.")
@@ -52,7 +56,7 @@ def main():
     )
 
 
-def display_skills(skills):
+def display_skills(skills: list[str]):
     if skills:
         st.subheader("Top Skills")
 
@@ -102,22 +106,12 @@ def display_skills(skills):
         )
 
         with st.spinner("Matching candidate's skills to job position..."):
-            skills_job_prompt = [
-                f"""Given this skill: {skill}, please provide your reasoning for why this skill 
-                    matter to the follloging job position: {job_position} at {company}.
-                    if the skill is not relevant please say so.
-                    Use system thinking level 3 to accomplish this task"""
-                for skill in skills
-            ]
-
-            skills_job_prompt = f"""{", ".join(skills_job_prompt)}
-                Please use the following schema: {JobSkill.model_json_schema()}
-                Provide the result in a structured JSON format. Please remove any ```json ``` characters from the output.
-                """
-
             if "job_matching_skills" not in st.session_state:
-                output = llm.complete(skills_job_prompt)
-                st.session_state.job_matching_skills = json.loads(output.text)["skills"]
+                st.session_state.job_matching_skills = (
+                    st.session_state.resumeInsights.match_job_to_skills(
+                        skills, job_position, company
+                    )
+                )
             else:
                 with st.expander("Skill Relevance"):
                     for skill, props in st.session_state.job_matching_skills.items():
