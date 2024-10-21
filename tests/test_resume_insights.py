@@ -3,8 +3,6 @@ from unittest.mock import patch, MagicMock
 from resume_insights import ResumeInsights
 from models import Candidate, JobSkill, Skill
 
-import json
-
 
 class TestResumeInsights(unittest.TestCase):
 
