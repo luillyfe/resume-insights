@@ -2,7 +2,7 @@ import streamlit as st
 import tempfile
 import random
 
-from resume_parser import ResumeInsights
+from resume_insights import ResumeInsights
 
 
 def main():

@@ -96,7 +96,7 @@ class ResumeInsights:
         Configures the settings for the index such LLM query model and embedding model.
         """
         # LLM query model and embedding model definition
-        llm = Gemini(model_name="models/gemini-1.5-flash-002", api_key=GOOGLE_API_KEY)
+        llm = Gemini(model="models/gemini-1.5-flash-002", api_key=GOOGLE_API_KEY)
         embed_model = GeminiEmbedding(
             model_name="models/text-embedding-004", api_key=GOOGLE_API_KEY
         )
