@@ -44,11 +44,7 @@ def main():
             st.write(f"**Email:** {insights.email}")
             st.write(f"**Age:** {insights.age}")
 
-            # The Free Tier Gemini API has a limitation of 10k bytes on the request payload,
-            # and since the query engine is going to augment the prompt
-            # with conxtextual information found in the document,
-            # reducing the skill's number would limit the request payload.
-            skills = insights.skills[:20]
+            skills = insights.skills if insights.skills else []
             display_skills(skills)
 
     else:
