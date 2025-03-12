@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 
 # Candidate Data Structure Definition (output definition)
@@ -10,8 +10,8 @@ class Candidate(BaseModel):
         None,
         description="The age of the candidate. If not explicitly stated, estimate based on education or work experience.",
     )
-    skills: Optional[list[str]] = Field(
-        None, description="A list of skills possessed by the candidate"
+    skills: Optional[Dict[str, 'SkillDetail']] = Field(
+        None, description="A dictionary of skills possessed by the candidate with detailed information"
     )
 
 
@@ -27,6 +27,15 @@ class Skill(BaseModel):
         None,
         description="Based on the year's he worked using this skill, please provide an  proficiency level",
     )
+
+
+class SkillDetail(BaseModel):
+    skill_name: str = Field(description="The name of the skill")
+    category: Optional[str] = Field(None, description="Category of the skill (Technical, Soft Skill, Domain Knowledge, etc.)")
+    proficiency: Optional[float] = Field(None, description="Proficiency level on a 0-100 scale")
+    years_experience: Optional[float] = Field(None, description="Years of experience with this skill")
+    mentions: Optional[List[str]] = Field(None, description="Contexts where the skill was mentioned")
+    related_skills: Optional[List[str]] = Field(None, description="List of related skills")
 
 
 class JobSkill(BaseModel):
