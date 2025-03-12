@@ -1,6 +1,5 @@
 import streamlit as st
 import tempfile
-import random
 
 from resume_insights import ResumeInsights
 from typing import Dict
