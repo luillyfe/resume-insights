@@ -40,10 +40,37 @@ def main():
         if "insights" in st.session_state:
             insights = st.session_state.insights
 
-            st.subheader("Extracted Information")
-            st.write(f"**Name:** {insights.name}")
-            st.write(f"**Email:** {insights.email}")
-            st.write(f"**Age:** {insights.age}")
+             # Display candidate information in a clean format
+            st.subheader("Candidate Profile")
+
+            # Create a two-column layout for contact information
+            col1, col2 = st.columns(2)
+            
+            # Get candidate info from session state
+            insights = st.session_state.insights
+            
+            # Display contact information in the first column
+            with col1:
+                st.write(f"**Name:** {insights.name}")
+                st.write(f"**Email:** {insights.email}")
+                st.write(f"**Age:** {insights.age}")
+                
+                    
+            # Display additional information in the second column
+            with col2:
+                if insights.phone:
+                    st.write(f"**Phone:** {insights.phone}")
+                if insights.location:
+                    st.write(f"**Location:** {insights.location}")
+                if insights.summary:
+                    # Truncate summary to 200 characters if longer
+                    display_summary = insights.summary[:100] + ("..." if len(insights.summary) > 200 else "")
+                    st.write(f"**Summary:** {display_summary}")
+                    
+            # Display professional summary if available
+            if insights.summary and len(insights.summary) > 100:
+                with st.expander("Full Professional Summary"):
+                    st.write(insights.summary)
 
             # Ensure skills is a dictionary before passing to display_skills
             skills = insights.skills if isinstance(insights.skills, dict) else {}
@@ -77,35 +104,7 @@ def main():
 
 
 def display_skills(skills: Dict[str, SkillDetail]):
-    if skills:
-        # Display candidate information in a clean format
-        st.subheader("Candidate Profile")
-        
-        # Create a two-column layout for contact information
-        col1, col2 = st.columns(2)
-        
-        # Get candidate info from session state
-        insights = st.session_state.insights
-        
-        # Display contact information in the first column
-        with col1:
-            if insights.phone:
-                st.write(f"**Phone:** {insights.phone}")
-            if insights.location:
-                st.write(f"**Location:** {insights.location}")
-                
-        # Display additional information in the second column
-        with col2:
-            if insights.summary:
-                # Truncate summary to 200 characters if longer
-                display_summary = insights.summary[:100] + ("..." if len(insights.summary) > 200 else "")
-                st.write(f"**Summary:** {display_summary}")
-                
-        # Display professional summary if available
-        if insights.summary and len(insights.summary) > 100:
-            with st.expander("Full Professional Summary"):
-                st.write(insights.summary)
-        
+    if skills: 
         # Skills section
         st.subheader("Top Skills")
 
