@@ -4,12 +4,15 @@ from typing import Optional, Dict, List
 
 # Candidate Data Structure Definition (output definition)
 class Candidate(BaseModel):
-    name: Optional[str] = Field(None, description="The full name of the candidate")
-    email: Optional[str] = Field(None, description="The email of the candidate")
+    name: Optional[str] = Field(None, description="The full name of the candidate as it appears on the resume")
+    email: Optional[str] = Field(None, description="The email address of the candidate, usually found in the contact information section")
+    phone: Optional[str] = Field(None, description="The phone number of the candidate")
+    location: Optional[str] = Field(None, description="The location or address of the candidate")
     age: Optional[int] = Field(
         None,
         description="The age of the candidate. If not explicitly stated, estimate based on education or work experience.",
     )
+    summary: Optional[str] = Field(None, description="A brief professional summary or objective statement from the resume")
     skills: Optional[Dict[str, 'SkillDetail']] = Field(
         None, description="A dictionary of skills possessed by the candidate with detailed information"
     )

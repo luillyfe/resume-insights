@@ -58,6 +58,16 @@ def main():
         "This app uses LlamaIndex and Gemini to parse resumes and extract key information. "
         "Upload a PDF resume to see it in action!"
     )
+    
+    # Add visual indicator in sidebar
+    if "insights" in st.session_state and st.session_state.insights.skills:
+        st.sidebar.markdown("""
+        <div style="text-align: center; margin: 20px 0; padding: 10px; border-radius: 5px; background-color: #f0f9ff; border-left: 4px solid #4CAF50;">
+            <p style="color: #1E6823; font-weight: bold;">⬇️ Scroll Down ⬇️</p>
+            <p style="font-size: 0.9em;">Don't miss the job matching feature below the skills section!</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
     st.sidebar.subheader("Long Rank Dependencies Limitation")
     st.sidebar.info(
         """ LlamaIndex faces challenges when it comes to handling knowledge dispersed across different sections of a document. 
@@ -68,6 +78,35 @@ def main():
 
 def display_skills(skills: Dict[str, SkillDetail]):
     if skills:
+        # Display candidate information in a clean format
+        st.subheader("Candidate Profile")
+        
+        # Create a two-column layout for contact information
+        col1, col2 = st.columns(2)
+        
+        # Get candidate info from session state
+        insights = st.session_state.insights
+        
+        # Display contact information in the first column
+        with col1:
+            if insights.phone:
+                st.write(f"**Phone:** {insights.phone}")
+            if insights.location:
+                st.write(f"**Location:** {insights.location}")
+                
+        # Display additional information in the second column
+        with col2:
+            if insights.summary:
+                # Truncate summary to 200 characters if longer
+                display_summary = insights.summary[:100] + ("..." if len(insights.summary) > 200 else "")
+                st.write(f"**Summary:** {display_summary}")
+                
+        # Display professional summary if available
+        if insights.summary and len(insights.summary) > 100:
+            with st.expander("Full Professional Summary"):
+                st.write(insights.summary)
+        
+        # Skills section
         st.subheader("Top Skills")
 
         # Custom CSS for skill bars

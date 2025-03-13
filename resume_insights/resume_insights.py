@@ -58,12 +58,15 @@ class ResumeInsights:
         # Output Schema
         output_schema = Candidate.model_json_schema()
 
-        # Schema-driven prompt
+        # Completely schema-driven prompt
         prompt = f"""
-                Analyze the resume and extract information according to this JSON schema:
+                Thoroughly analyze the resume document and extract all relevant information.
+                
+                Use this JSON schema to determine what information to extract:
                 {output_schema}
                 
-                Return a valid JSON object that strictly follows the provided schema structure.
+                Pay close attention to the schema's field descriptions to understand what data to extract.
+                Return a complete and valid JSON object that strictly follows the provided schema structure.
                 Do not include any explanations or markdown formatting in your response.
                 """
 
