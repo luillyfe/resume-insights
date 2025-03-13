@@ -71,7 +71,7 @@ class ResumeInsights:
         output = self.query_engine.query(prompt)
         # Parse the response
         cleaned_output = clean_llm_response(str(output))
-        print(cleaned_output)
+
         return Candidate.model_validate_json(cleaned_output)
 
     def match_job_to_skills(
