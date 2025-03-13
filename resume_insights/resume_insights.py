@@ -28,8 +28,6 @@ class ResumeInsights:
         Returns:
             Candidate: The extracted candidate data.
         """
-        # Output Schema
-        output_schema = Candidate.model_json_schema()
 
         # Extract work history first to use for skill analysis
         work_history = self.work_history_analyzer.extract_work_history()
@@ -42,22 +40,39 @@ class ResumeInsights:
             resume_text, work_history
         )
 
-        # Prompt
+        # Parse candidate data from the resume
+        candidate = self._parse_candidate_data()
+
+        # Update the candidate with detailed skills
+        candidate.skills = skills_with_details
+
+        return candidate
+        
+    def _parse_candidate_data(self) -> Candidate:
+        """
+        Parses basic candidate data from the resume using the Candidate schema.
+        
+        Returns:
+            Candidate: The parsed candidate data without detailed skills.
+        """
+        # Output Schema
+        output_schema = Candidate.model_json_schema()
+
+        # Schema-driven prompt
         prompt = f"""
-                Use the following JSON schema describing the information I need to extract:
+                Analyze the resume and extract information according to this JSON schema:
                 {output_schema}
+                
+                Return a valid JSON object that strictly follows the provided schema structure.
+                Do not include any explanations or markdown formatting in your response.
                 """
 
         # Text output
         output = self.query_engine.query(prompt)
         # Parse the response
         cleaned_output = clean_llm_response(str(output))
-        candidate = Candidate.model_validate_json(cleaned_output)
-
-        # Update the candidate with detailed skills
-        candidate.skills = skills_with_details
-
-        return candidate
+        print(cleaned_output)
+        return Candidate.model_validate_json(cleaned_output)
 
     def match_job_to_skills(
         self, skills: List[str], job_position: str, company: str
