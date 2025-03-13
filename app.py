@@ -40,7 +40,7 @@ def main():
         if "insights" in st.session_state:
             insights = st.session_state.insights
 
-             # Display candidate information in a clean format
+            # Display candidate information in a clean format
             st.subheader("Candidate Profile")
 
             # Create a two-column layout for contact information
