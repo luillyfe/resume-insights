@@ -29,8 +29,8 @@ def configure_settings():
         sys.exit(1)
         
     # LLM query model and embedding model definition
-    llm = GoogleGenAI(model="models/gemini-1.5-flash-002")
-    embed_model = GoogleGenAIEmbedding(model_name="models/text-embedding-004")
+    llm = GoogleGenAI(model="models/gemini-1.5-flash-002", api_key=GOOGLE_API_KEY)
+    embed_model = GoogleGenAIEmbedding(model_name="models/text-embedding-004", api_key=GOOGLE_API_KEY)
 
     # Text Splitter strategy
     sentence_splitter = SentenceSplitter(chunk_size=1024, chunk_overlap=20)
