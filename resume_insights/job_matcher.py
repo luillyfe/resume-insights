@@ -38,7 +38,7 @@ class JobMatcher:
 
         skills_job_prompt = f"""{", ".join(skills_job_prompt)}
             Please use the following schema: {JobSkill.model_json_schema()}
-            Provide the result in a structured JSON format. Please remove any ```json ``` characters from the output.
+            Provide the result in a structured JSON format.
             """
 
         output = self.query_engine.query(skills_job_prompt)
