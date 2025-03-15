@@ -1,9 +1,9 @@
 import streamlit as st
 import tempfile
 
-from resume_insights import ResumeInsights
 from typing import Dict
 from resume_insights.models import SkillDetail
+from resume_insights import create_resume_insights
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
                         temp_file_path = temp_file.name
 
                     # Extract the candidate data from the resume
-                    st.session_state.resumeInsights = ResumeInsights(temp_file_path)
+                    st.session_state.resumeInsights = create_resume_insights(temp_file_path)
                     st.session_state.insights = (
                         st.session_state.resumeInsights.extract_candidate_data()
                     )
