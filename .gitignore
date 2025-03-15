@@ -2,6 +2,7 @@
 venv/
 pyenv/
 resume-insights/
+.files/
 
 # Ignore Python bytecode files
 *.pyc
