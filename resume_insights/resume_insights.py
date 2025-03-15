@@ -5,7 +5,7 @@ from llama_cloud_services.parse import ResultType
 
 from typing import List, Dict, cast
 
-from models import Candidate, JobSkill
+from resume_insights.models import Candidate, JobSkill
 from resume_insights.config import LLAMA_CLOUD_API_KEY, configure_settings
 from resume_insights.utils import clean_llm_response
 from resume_insights.skill_analyzer import SkillAnalyzer

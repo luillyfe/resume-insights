@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock
 from datetime import datetime
-from models import SkillDetail
+from resume_insights.models import SkillDetail
 from resume_insights.skill_analyzer import SkillAnalyzer
 from resume_insights.utils import parse_date
 

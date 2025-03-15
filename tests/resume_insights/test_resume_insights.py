@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import Mock, patch
-from models import Candidate, SkillDetail, JobSkill, Skill
+from resume_insights.models import Candidate, SkillDetail, JobSkill, Skill
 from resume_insights.resume_insights import ResumeInsights
 from resume_insights.skill_analyzer import SkillAnalyzer
 from resume_insights.work_history_analyzer import WorkHistoryAnalyzer

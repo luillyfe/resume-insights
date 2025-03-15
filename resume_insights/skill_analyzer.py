@@ -2,7 +2,7 @@ import re
 import copy
 from typing import Dict, List
 from resume_insights.utils import parse_date
-from models import SkillDetail
+from resume_insights.models import SkillDetail
 
 class SkillAnalyzer:
     """
