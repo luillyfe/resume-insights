@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import Mock, patch
-from models import Candidate, SkillDetail, JobSkill, Skill
+from resume_insights.models import Candidate, SkillDetail, JobSkill, Skill
 from resume_insights.resume_insights import ResumeInsights
 from resume_insights.skill_analyzer import SkillAnalyzer
 from resume_insights.work_history_analyzer import WorkHistoryAnalyzer
@@ -155,7 +155,7 @@ def test_match_job_to_skills(resume_insights, sample_data):
     assert result == mock_job_skill
 
 
-def test_create_query_engine(sample_file_path):
+def test_create_query_engine(mock_configure_settings, sample_file_path):
     """Test that _create_query_engine sets up the components correctly."""
     with patch('resume_insights.resume_insights.LlamaParse') as mock_llama_parse, \
          patch('resume_insights.resume_insights.SimpleDirectoryReader') as mock_directory_reader, \

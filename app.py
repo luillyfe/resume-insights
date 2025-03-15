@@ -3,7 +3,7 @@ import tempfile
 
 from resume_insights import ResumeInsights
 from typing import Dict
-from models import SkillDetail
+from resume_insights.models import SkillDetail
 
 
 def main():

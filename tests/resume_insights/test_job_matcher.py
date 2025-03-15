@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import Mock, patch
-from models import JobSkill
+from resume_insights.models import JobSkill
 from resume_insights.job_matcher import JobMatcher
 
 class TestJobMatcher(unittest.TestCase):

@@ -1,5 +1,5 @@
 from typing import List
-from models import JobSkill
+from resume_insights.models import JobSkill
 from resume_insights.utils import clean_llm_response
 
 class JobMatcher:
