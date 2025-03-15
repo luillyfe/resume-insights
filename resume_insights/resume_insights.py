@@ -104,14 +104,10 @@ class ResumeInsights:
             The created query engine.
         """
 
-        # Make sure LLAMA_CLOUD_API_KEY is defined and not None
-        if LLAMA_CLOUD_API_KEY is None:
-            raise ValueError("LLAMA_CLOUD_API_KEY is not set")
-
         # Parser
         parser = LlamaParse(
             result_type=ResultType.TXT,  # "markdown" and "text" are available
-            api_key=LLAMA_CLOUD_API_KEY,
+            api_key=str(LLAMA_CLOUD_API_KEY),
             # verbose=True,
         )
 
