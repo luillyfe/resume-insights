@@ -33,6 +33,7 @@ class SkillAnalyzer:
         """
         # 1. Extract raw skills using LLM
         raw_skills = self._extract_raw_skills()
+        
 
         # 2. Categorize skills using predefined taxonomies
         categorized_skills = self._categorize_skills(raw_skills)
@@ -55,48 +56,34 @@ class SkillAnalyzer:
     def _extract_raw_skills(self) -> List[str]:
         """
         Extract raw skills from resume text using LLM.
-
-        Returns:
-            List[str]: List of raw skills
         """
         prompt = """
-        Given the resume text, please identify and list all technical skills, soft skills, and domain knowledge.
-        Return only the list of skills without any additional text or explanations.
+        List skills in EXACTLY this format:
+        Technical Skills: skill1, skill2, skill3
+        Soft Skills: skill4, skill5
+        Domain Knowledge: skill6, skill7
+        
+        Return only these 3 lines with comma-separated values. 
+        No bullet points, numbers, or additional text.
         """
 
         response_obj = self.query_engine.query(prompt)
         skills = []
 
         try:
-            # For llama_index.core.base.response.schema.Response objects
             if hasattr(response_obj, "response"):
-                skills_text = str(response_obj)
-
-                # If the response is a string
-                if isinstance(skills_text, str):
-                    # Try to split it into categories if it's a multi-line string
-                    categories = [
-                        s.strip() for s in skills_text.split("\n") if s.strip()
-                    ]
-                    for category in categories:
-                        # Check if the category follows the format "Category: skill1, skill2, ..."
-                        if ": " in category:
-                            parts = category.split(": ", 1)
-                            if len(parts) == 2:
-                                # Extract the skills part and split by commas
-                                skills_part = parts[1]
-                                category_skills = [
-                                    s.strip().lstrip("-*•").strip()
-                                    for s in skills_part.split(", ")
-                                ]
-                                skills.extend(category_skills)
-                        else:
-                            # If the category doesn't follow the expected format, treat the whole line as a skill
-                            skills.append(category.strip().lstrip("-*•").strip())
-            else:
-                print(
-                    f"Response object doesn't have a 'response' attribute: {type(response_obj)}"
-                )
+                skills_text = str(response_obj).strip()
+                
+                # Extract skills from all categories
+                for line in skills_text.split("\n"):
+                    if line.startswith(("Technical Skills:", "Soft Skills:", "Domain Knowledge:")):
+                        # Remove category prefix and split skills
+                        skills_part = line.split(":", 1)[-1].strip()
+                        skills.extend([
+                            skill.strip() 
+                            for skill in skills_part.split(",") 
+                            if skill.strip()
+                        ])
 
         except Exception as e:
             print(f"Error processing skills: {e}")
@@ -115,44 +102,56 @@ class SkillAnalyzer:
         categorized_skills = {}
 
         prompt = f"""
-        For each of the following skills, categorize it into one of these categories:
-        - Programming Languages
-        - Frameworks & Libraries
-        - Tools & Technologies
-        - Soft Skills
-        - Domain Knowledge
-        - Other
+        Categorize these skills into EXACTLY these categories:
+        Programming Languages
+        Frameworks & Libraries
+        Tools & Technologies
+        Soft Skills
+        Domain Knowledge
 
-        Skills: {', '.join(skills)}
+        Format your response like this:
+        Programming Languages: Skill1, Skill2, Skill3
+        Frameworks & Libraries: Skill4, Skill5
+        Tools & Technologies: Skill6, Skill7
+        Soft Skills: Skill8, Skill9
+        Domain Knowledge: Skill10, Skill11
 
-        For each skill, provide the category and any subcategory if applicable.
+        Rules:
+        - List ALL skills under EXACTLY ONE category
+        - Use only the specified category names
+        - No subcategories, explanations, or additional text
+        - Maintain original skill capitalization
+
+        Skills to categorize: {', '.join(skills)}
         """
 
         response = self.query_engine.query(prompt)
-        # Parse the response to get categorized skills
-        # If the response is a llama_index.core.base.response.schema.Response object:
+        
         if hasattr(response, "response"):
             skills_text = str(response)
-            # Split the text into lines and remove empty lines
-            lines = [line.strip() for line in skills_text.split("\n") if line.strip()]
+            categorized_skills = {category: [] for category in [
+                "Programming Languages",
+                "Frameworks & Libraries", 
+                "Tools & Technologies",
+                "Soft Skills",
+                "Domain Knowledge"
+            ]}
+            
+            # Simplified parsing for direct category: skills format
+            for line in skills_text.split('\n'):
+                line = line.strip()
+                for category in categorized_skills.keys():
+                    if line.startswith(f"{category}:"):
+                        skills_part = line.split(":", 1)[-1].strip()
+                        categorized_skills[category].extend([
+                            s.strip() 
+                            for s in skills_part.split(",")
+                            if s.strip()
+                        ])
 
-            # Initialize the result dictionary
-            categorized_skills = {}
-            current_category = None
-
-            for line in lines:
-                # Check for category headers (bold text)
-                if line.startswith("**") and line.endswith(":**"):
-                    # Remove the ** and : from the category name
-                    current_category = line.strip("*:")
-                    categorized_skills[current_category] = []
-
-                # Check for skills (marked with *)
-                elif line.startswith("* ") and current_category:
-                    # Remove the * and leading/trailing whitespace
-                    skill = line.lstrip("* ").strip()
-                    categorized_skills[current_category].append(skill)
-
+            # Clean empty categories
+            categorized_skills = {k: v for k, v in categorized_skills.items() if v}
+            
         return categorized_skills
 
     def _calculate_experience_duration(
