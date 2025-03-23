@@ -85,23 +85,18 @@ class TestSkillAnalyzer(unittest.TestCase):
 
     def test_categorize_skills(self):
         # Sample skills to categorize
-        raw_skills = ["Python", "JavaScript", "Leadership", "React", "Machine Learning"]
+        raw_skills = ["Python", "JavaScript", "Risk Management", "React", "Machine Learning"]
         
         # Create a mock response object with a response attribute
         mock_response = Mock()
         mock_response.response = """
-        **Programming Languages:**
-        * Python
-        * JavaScript
+        Programming Languages: Python, JavaScript
         
-        **Frameworks & Libraries:**
-        * React
+        Frameworks & Libraries: React
         
-        **Tools & Technologies:**
-        * Machine Learning
+        Tools & Technologies: Machine Learning
         
-        **Soft Skills:**
-        * Leadership
+        Domain Knowledge: Risk Management
         """
         # Configure the mock to return the response text when converted to string
         type(mock_response).__str__ = Mock(return_value=mock_response.response)
@@ -116,11 +111,11 @@ class TestSkillAnalyzer(unittest.TestCase):
         self.assertIsInstance(categorized_skills, dict)
         self.assertIn("Programming Languages", categorized_skills)
         self.assertIn("Frameworks & Libraries", categorized_skills)
-        self.assertIn("Soft Skills", categorized_skills)
+        self.assertIn("Domain Knowledge", categorized_skills)
         self.assertIn("Python", categorized_skills["Programming Languages"])
         self.assertIn("JavaScript", categorized_skills["Programming Languages"])
         self.assertIn("React", categorized_skills["Frameworks & Libraries"])
-        self.assertIn("Leadership", categorized_skills["Soft Skills"])
+        self.assertIn("Risk Management", categorized_skills["Domain Knowledge"])
 
     def test_calculate_experience_duration(self):
         # Sample categorized skills
@@ -277,13 +272,9 @@ class TestSkillAnalyzer(unittest.TestCase):
         # For _categorize_skills
         categorize_mock = Mock()
         categorize_mock.response = """
-        **Programming Languages:**
-        * Python
-        * JavaScript
+        Programming Languages: Python, JavaScript
         
-        **Frameworks & Libraries:**
-        * React
-        * Django
+        Frameworks & Libraries: React, Django
         """
         type(categorize_mock).__str__ = Mock(return_value=categorize_mock.response)
         
