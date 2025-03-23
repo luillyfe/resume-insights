@@ -56,6 +56,9 @@ class SkillAnalyzer:
     def _extract_raw_skills(self) -> List[str]:
         """
         Extract raw skills from resume text using LLM.
+
+        Returns:
+            List[str]: List of raw skills
         """
         prompt = """
         List skills in EXACTLY this format:
