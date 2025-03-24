@@ -3,7 +3,8 @@ import copy
 from typing import Dict, List
 from resume_insights.utils import parse_date
 from resume_insights.models import SkillDetail
-from observability.metrics import timed, MetricsCollector
+from observability.metrics import timed
+from observability.logging import Logger
 
 class SkillAnalyzer:
     """
@@ -18,6 +19,7 @@ class SkillAnalyzer:
             query_engine: The query engine to use for extracting information
         """
         self.query_engine = query_engine
+        self.logger = Logger("SkillAnalyzer")
         
     @timed(metric_name="extract_skills_with_details.time", tags={"component": "SkillAnalyzer"})
     def extract_skills_with_details(
@@ -34,25 +36,31 @@ class SkillAnalyzer:
             Dict[str, SkillDetail]: Dictionary of skills with their details
         """
         # 1. Extract raw skills using LLM
+        self.logger.info("Starting skill extraction process")
         raw_skills = self._extract_raw_skills()
         
 
         # 2. Categorize skills using predefined taxonomies
+        self.logger.info(f"Extracted {len(raw_skills)} raw skills, proceeding to categorization")
         categorized_skills = self._categorize_skills(raw_skills)
 
         # 3. Calculate experience duration by analyzing work history sections
+        self.logger.info(f"Categorized skills into {len(categorized_skills)} categories")
         skills_with_experience = self._calculate_experience_duration(
             categorized_skills, work_history
         )
 
         # 4. Estimate proficiency based on various factors
+        self.logger.info("Calculated experience duration for skills, proceeding to proficiency estimation")
         skills_with_proficiency = self._estimate_proficiency(
             skills_with_experience, resume_text
         )
 
         # 5. Find related skills
+        self.logger.info("Estimated proficiency for skills, finding related skills")
         skill_details = self._find_related_skills(skills_with_proficiency)
 
+        self.logger.info(f"Skill extraction complete, found {len(skill_details)} skills with details")
         return skill_details
 
     @timed(metric_name="extract_raw_skills.time", tags={"component": "SkillAnalyzer"})
@@ -85,14 +93,12 @@ class SkillAnalyzer:
                     if line.startswith(("Technical Skills:", "Soft Skills:", "Domain Knowledge:")):
                         # Remove category prefix and split skills
                         skills_part = line.split(":", 1)[-1].strip()
-                        skills.extend([
-                            skill.strip() 
-                            for skill in skills_part.split(",") 
-                            if skill.strip()
-                        ])
+                        category_skills = [skill.strip() for skill in skills_part.split(",") if skill.strip()]
+                        skills.extend(category_skills)
+                        self.logger.debug(f"Extracted {len(category_skills)} skills from category {line.split(':', 1)[0]}")
 
         except Exception as e:
-            print(f"Error processing skills: {e}")
+            self.logger.error(f"Error processing skills", error=e)
 
         return skills
 
@@ -159,6 +165,10 @@ class SkillAnalyzer:
             # Clean empty categories
             categorized_skills = {k: v for k, v in categorized_skills.items() if v}
             
+            # Log categorization results
+            for category, skills_list in categorized_skills.items():
+                self.logger.debug(f"Category '{category}' has {len(skills_list)} skills")
+            
         return categorized_skills
 
     @timed(metric_name="calculate_experience_duration.time", tags={"component": "SkillAnalyzer"})
@@ -183,6 +193,7 @@ class SkillAnalyzer:
             all_skills.extend(skills)
 
         # For each skill, analyze work history to find mentions and calculate duration
+        self.logger.debug(f"Analyzing work history with {len(work_history)} entries to calculate skill experience")
         for category, skills in categorized_skills.items():
             skills_with_experience[category] = []
 
@@ -250,6 +261,7 @@ class SkillAnalyzer:
         skills_with_proficiency = copy.deepcopy(skills_with_experience)
 
         # Iterate through each category
+        self.logger.debug("Estimating proficiency for skills based on experience and context")
         for category, skills_list in skills_with_experience.items():
             # Iterate through each skill in the category
             for i, skill_info in enumerate(skills_list):
@@ -348,9 +360,11 @@ class SkillAnalyzer:
                 }
 
         skill_names = list(all_skills.keys())
+        self.logger.debug(f"Finding related skills for {len(skill_names)} skills")
 
         # Process skills in chunks to avoid API limitations
         skill_chunks = [skill_names[i : i + 5] for i in range(0, len(skill_names), 5)]
+        self.logger.debug(f"Processing skills in {len(skill_chunks)} chunks to find related skills")
 
         for chunk in skill_chunks:
             prompt = f"""
@@ -389,4 +403,5 @@ class SkillAnalyzer:
                 related_skills=skill_info.get("related_skills"),
             )
 
+        self.logger.info(f"Skill extraction complete, found {len(skill_details)} skills with details")
         return skill_details
