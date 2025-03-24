@@ -12,6 +12,7 @@ from resume_insights.utils import clean_llm_response
 from resume_insights.skill_analyzer import SkillAnalyzer
 from resume_insights.work_history_analyzer import WorkHistoryAnalyzer
 from resume_insights.job_matcher import JobMatcher
+from observability.logging import Logger
 
 
 class QueryEngineFactory:
@@ -93,6 +94,10 @@ class ResumeInsights:
         Raises:
             ValueError: If neither query_engine nor file_path is provided.
         """
+        # Initialize logger
+        self.logger = Logger("ResumeInsights")
+        self.logger.info("Initializing ResumeInsights")
+        
         if query_engine is None and file_path is None:
             raise ValueError("Either query_engine or file_path must be provided")
             
@@ -117,26 +122,37 @@ class ResumeInsights:
         Raises:
             Exception: If extraction fails at any point.
         """
+        self.logger.info("Extracting candidate data from resume")
+        
         try:
             # Extract work history first to use for skill analysis
+            self.logger.debug("Extracting work history")
             work_history = self.work_history_analyzer.extract_work_history()
 
             # Extract resume text
+            self.logger.debug("Extracting resume text")
             resume_text = self.work_history_analyzer.extract_resume_text()
 
             # Extract detailed skills
+            self.logger.debug("Extracting skills with details")
             skills_with_details = self.skill_analyzer.extract_skills_with_details(
                 resume_text, work_history
             )
 
             # Parse candidate data from the resume
+            self.logger.debug("Parsing candidate data")
             candidate = self._parse_candidate_data()
 
             # Update the candidate with detailed skills
             candidate.skills = skills_with_details
+            
+            self.logger.info("Successfully extracted candidate data", {
+                "skills_count": len(skills_with_details) if skills_with_details else 0
+            })
 
             return candidate
         except Exception as e:
+            self.logger.error("Failed to extract candidate data", e)
             raise Exception(f"Failed to extract candidate data: {str(e)}")
         
     def _parse_candidate_data(self) -> Candidate:
@@ -193,9 +209,18 @@ class ResumeInsights:
         Raises:
             Exception: If matching fails.
         """
+        self.logger.info("Matching job to skills", {
+            "job_position": job_position,
+            "company": company,
+            "skills_count": len(skills) if skills else 0
+        })
+        
         try:
-            return self.job_matcher.match_job_to_skills(skills, job_position, company)
+            job_skill = self.job_matcher.match_job_to_skills(skills, job_position, company)
+            self.logger.info("Successfully matched job to skills")
+            return job_skill
         except Exception as e:
+            self.logger.error("Failed to match job to skills", e)
             raise Exception(f"Failed to match job to skills: {str(e)}")
 
 
