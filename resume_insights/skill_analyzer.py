@@ -3,6 +3,7 @@ import copy
 from typing import Dict, List
 from resume_insights.utils import parse_date
 from resume_insights.models import SkillDetail
+from observability.metrics import timed, MetricsCollector
 
 class SkillAnalyzer:
     """
@@ -18,6 +19,7 @@ class SkillAnalyzer:
         """
         self.query_engine = query_engine
         
+    @timed(metric_name="extract_skills_with_details.time", tags={"component": "SkillAnalyzer"})
     def extract_skills_with_details(
         self, resume_text: str, work_history: List[Dict]
     ) -> Dict[str, SkillDetail]:
@@ -53,6 +55,7 @@ class SkillAnalyzer:
 
         return skill_details
 
+    @timed(metric_name="extract_raw_skills.time", tags={"component": "SkillAnalyzer"})
     def _extract_raw_skills(self) -> List[str]:
         """
         Extract raw skills from resume text using LLM.
@@ -93,6 +96,7 @@ class SkillAnalyzer:
 
         return skills
 
+    @timed(metric_name="categorize_skills.time", tags={"component": "SkillAnalyzer"})
     def _categorize_skills(self, skills: List[str]) -> Dict[str, List[str]]:
         """
         Args:
@@ -157,6 +161,7 @@ class SkillAnalyzer:
             
         return categorized_skills
 
+    @timed(metric_name="calculate_experience_duration.time", tags={"component": "SkillAnalyzer"})
     def _calculate_experience_duration(
         self, categorized_skills: Dict[str, List[str]], work_history: List[Dict]
     ) -> Dict[str, List[Dict]]:
@@ -228,6 +233,7 @@ class SkillAnalyzer:
 
         return skills_with_experience
 
+    @timed(metric_name="estimate_proficiency.time", tags={"component": "SkillAnalyzer"})
     def _estimate_proficiency(
         self, skills_with_experience: Dict[str, List[Dict]], resume_text: str
     ) -> Dict[str, List[Dict]]:
@@ -313,6 +319,7 @@ class SkillAnalyzer:
 
         return skills_with_proficiency
 
+    @timed(metric_name="find_related_skills.time", tags={"component": "SkillAnalyzer"})
     def _find_related_skills(
         self, skills_with_proficiency: Dict[str, List[Dict]]
     ) -> Dict[str, SkillDetail]:
