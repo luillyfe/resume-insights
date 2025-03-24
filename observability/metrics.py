@@ -43,6 +43,9 @@ class MetricsCollector:
             name: Metric name
             value: Value to increment by
             tags: Optional tags for the metric
+            
+        Note: Intended for use with a future @count_calls decorator to track
+        function call counts. (Example: API endpoint request counts)
         """
         if name not in self.metrics:
             self.metrics[name] = {"type": "counter", "value": 0, "tags": tags or {}}
@@ -57,6 +60,9 @@ class MetricsCollector:
             name: Metric name
             value: Current value
             tags: Optional tags for the metric
+            
+        Note: Intended for use with a future @monitor_value decorator to track
+        dynamic values. (Example: Queue sizes or resource utilization)
         """
         self.metrics[name] = {"type": "gauge", "value": value, "tags": tags or {}}
         self._export_metric(name, self.metrics[name])
