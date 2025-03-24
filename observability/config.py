@@ -9,6 +9,14 @@ DEFAULT_OBSERVABILITY_CONFIG = {
         "format": "json",
         "output": ["console"],
         "file_path": os.environ.get("LOG_FILE_PATH", "logs/resume_insights.log")
+    },
+    "metrics": {
+        "enabled": True,
+        "exporters": ["console"],
+        "prometheus": {
+            "start_http_server": False,
+            "port": 8000
+        }
     }
 }
 
