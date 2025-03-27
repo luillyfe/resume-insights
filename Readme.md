@@ -81,11 +81,6 @@ Resume Insights is an advanced resume parsing and analysis tool that leverages t
 - `QueryEngineFactory`: Factory class for creating query engines from different file types.
 - Streamlit app: Provides the user interface for uploading resumes and displaying insights.
 
-## ⚠️ Limitations
-
-- The free tier of the Gemini API/Google Cloud has a 10k byte limit on request payloads, which may limit the number of skills that can be processed: [issue](https://discuss.ai.google.dev/t/payload-size-limit-error-with-embed-content-api/44342).
-- LlamaIndex may face challenges with knowledge dispersed across different sections of a document, such as inferring age or skill proficiency from work experience.
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
